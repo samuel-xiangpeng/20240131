@@ -1,6 +1,7 @@
 {
-  "colors" : [
+  "data" : [
     {
+      "filename" : "success.json",
       "idiom" : "universal"
     }
   ],
