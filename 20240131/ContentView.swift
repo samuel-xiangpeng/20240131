@@ -11,21 +11,29 @@ struct ContentView: View {
     
     @State var animationShow: Bool = false
     
+    @State var currentCardPosition = CGSize.zero
+    
+    @State var bottomCardShow: Bool = false
+    
     var body: some View {
         ZStack {
             TitleView()
+                .offset(CGSize(width: 0, height: bottomCardShow ? -150 : 0))
                 .blur(radius: animationShow ? 20 : 0)
-                .animation(.default, value: animationShow)
+                .animation(Animation.default.delay(0.3), value: animationShow || bottomCardShow)
             
             BackCardView()
                 .background(Color(animationShow ? "card3" : "card4"))
                 .cornerRadius(20)
                 .shadow(radius: 20)
                 .offset(y: animationShow ? -400 : -40)
-                .scaleEffect(0.9)
+                .offset(CGSize(width: currentCardPosition.width, height: currentCardPosition.height))
+                .offset(y: bottomCardShow ? -180 : 0)
+                .scaleEffect(bottomCardShow ? 1.02 : 0.9)
                 .rotationEffect(.degrees(animationShow ? 0 : 10))
+                .rotationEffect(.degrees(bottomCardShow ? -10 : 0))
                 .rotation3DEffect(
-                    .degrees(10),
+                    .degrees(bottomCardShow ? 0 : 10),
                     axis: (x: 10.0, y: 10.0, z: 0.0)
                 )
                 .blendMode(.hardLight) // 混合模式
@@ -36,24 +44,44 @@ struct ContentView: View {
                 .cornerRadius(20)
                 .shadow(radius: 20)
                 .offset(y: animationShow ? -200 : -20)
-                .scaleEffect(0.9)
+                .offset(CGSize(width: currentCardPosition.width, height: currentCardPosition.height))
+                .offset(y: bottomCardShow ? -100 : 0)
+                .scaleEffect(bottomCardShow ? 1.02 : 0.9)
                 .rotationEffect(.degrees(animationShow ? 0 : 5))
+                .rotationEffect(.degrees(bottomCardShow ? -5 : 0))
                 .rotation3DEffect(
-                    .degrees(5),
+                    .degrees(bottomCardShow ? 0 : 5),
                     axis: (x: 10.0, y: 10.0, z: 0.0)
                 )
                 .blendMode(.hardLight) // 混合模式
-                .animation(.easeOut(duration: 0.5), value: animationShow)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: animationShow)
             
             CardView()
+                .scaleEffect(bottomCardShow ? 1.05 : 1)
+                .animation(.easeIn, value: bottomCardShow)
+                .offset(CGSize(width: currentCardPosition.width, height: currentCardPosition.height))
                 .blendMode(.hardLight)
                 .onTapGesture {
-                    self.animationShow.toggle()
+                    self.bottomCardShow.toggle()
                 }
+                .gesture(
+                    DragGesture()
+                        .onChanged({ value in
+                            currentCardPosition = value.translation
+                            animationShow = true
+                        })
+                        .onEnded({ value in
+                            currentCardPosition = CGSize.zero
+                            animationShow = false
+                        })
+                )
             
             BottomPopupview()
                 .blur(radius: animationShow ? 20 : 0)
-                .animation(.default, value: animationShow)
+                .offset(CGSize(width: 0, height: bottomCardShow ? -80 : 1000))
+                .zIndex(currentCardPosition != CGSize.zero ? -10 : 1.0)
+                .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.8), value: (animationShow || bottomCardShow))
+            
         }
     }
 }
