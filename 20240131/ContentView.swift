@@ -15,6 +15,10 @@ struct ContentView: View {
     
     @State var bottomCardShow: Bool = false
     
+    @State var bottomPosition: CGSize = CGSize.zero
+    
+    @State var showFull: Bool = false
+    
     var body: some View {
         ZStack {
             TitleView()
@@ -81,6 +85,33 @@ struct ContentView: View {
                 .offset(CGSize(width: 0, height: bottomCardShow ? -80 : 1000))
                 .zIndex(currentCardPosition != CGSize.zero ? -10 : 1.0)
                 .animation(.timingCurve(0.2, 0.8, 0.2, 1, duration: 0.8), value: (animationShow || bottomCardShow))
+                .offset(CGSize(width: 0, height: bottomPosition.height))
+                .gesture(
+                    DragGesture()
+                        .onChanged({ value in
+                            bottomPosition = value.translation
+                            if showFull {
+                                bottomPosition.height += -300
+                            }
+                            if bottomPosition.height < -300 {
+                                bottomPosition.height = -300
+                            }
+                        })
+                        .onEnded({ value in
+                            if bottomPosition.height > 50 {
+                                showFull = false
+                                bottomCardShow = false
+                            }
+                            
+                            if (!showFull && bottomPosition.height < -100) || (showFull && bottomPosition.height < -250) {
+                                bottomPosition.height = -300
+                                showFull = true
+                            } else {
+                                bottomPosition = CGSize.zero
+                                showFull = false
+                            }
+                        })
+                )
             
         }
     }
