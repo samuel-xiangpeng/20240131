@@ -28,9 +28,25 @@ struct HomeTopView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     ForEach(sectionData) { section in
-                        SectionCardView(section: section)
+                    
+                        GeometryReader { geometry in
+                            
+                            let geometryObj = geometry.frame(in: .global)
+                            
+                            VStack {
+                                SectionCardView(section: section)
+                                    .rotation3DEffect(
+                                        .degrees((Double(geometryObj.minX - 30) / -20)),
+                                        axis: (x: 0.0, y: 1.0, z: 0.0)
+                                )
+                            }
+                        }
+                        .frame(width: 275, height: 275)
                     }
                 }
+                .onHover(perform: { hovering in
+                    print(hovering.description)
+                })
                 .padding()
                 .padding(.bottom, 30 )
             }
@@ -89,9 +105,9 @@ struct SectionCardView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 210)
         }
-        .frame(width: 275, height: 275)
         .padding(.horizontal, 20)
         .padding(.top, 20)
+        .frame(width: 275, height: 275)
         .background(section.bgColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 5, y: 10)
