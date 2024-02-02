@@ -11,6 +11,8 @@ struct HomeTopView: View {
     
     @Binding var showProfile: Bool
     
+    @State var bellSheetStatus: Bool = false
+    
     var body: some View {
         VStack {
             HStack {
@@ -19,9 +21,25 @@ struct HomeTopView: View {
                     .fontWeight(.bold)
                 Spacer()
                 AvatorView(showProfile: $showProfile)
-                
+                Button(action: {
+                    bellSheetStatus.toggle()
+                }, label: {
+                    Image(systemName: "bell")
+                        .renderingMode(.original)
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .background(.white)
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.3), radius: 10 , x: 1, y: 1 )
+                        .shadow(color: .black.opacity(0.2), radius: 10 , x: 0, y: 5 )
+                        
+                })
             }
             .padding(.horizontal, 20)
+            .sheet(isPresented: $bellSheetStatus, content: {
+                Text("Hello World")
+            })
             
             //轮播 showsIndicators: 显示指标
             
@@ -44,9 +62,6 @@ struct HomeTopView: View {
                         .frame(width: 275, height: 275)
                     }
                 }
-                .onHover(perform: { hovering in
-                    print(hovering.description)
-                })
                 .padding()
                 .padding(.bottom, 30 )
             }
